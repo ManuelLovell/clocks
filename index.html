@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + TS</title>
+</head>
+
+<body>
+    <div id="app">
+        <div id="tabControls">
+            <button class="view-button selected" id="clockButton">Clocks</button>
+            <button class="view-button" id="checkboxButton">Boxes</button>
+            <button class="view-button" id="counterButton">Counters</button>
+            <div id="whatsNewContainer"></div>
+        </div>
+        <div id="gridContainer" class="main-grid">
+            <div id="clockContainer" class="main-grid-cell">
+                <div id="clockControls" class="control-overlay">
+                    <button id="clockRemove" class="control-button remove-button">x</button>
+                    <button id="clockAdd" class="control-button add-button">+</button>
+                    <button id="clockNext" class="control-button clock-next">〉</button>
+                    <button id="clockPrevious" class="control-button clock-prev">〈&nbsp;</button>
+                    <input id="clockName" class="control-button name-button" placeholder="Name...">
+                    <input id="clockSlices" type="number" class="control-button number-button" placeholder="6">
+                </div>
+                <div id="clockDisplay" class="clock-display carousel-container">
+                    <div id="clockCarousel" class="carousel-track"></div>
+                </div>
+            </div>
+            <div id="checkboxContainer" class="main-grid-cell" style="display: none;">
+                <div id="checkboxControls" class="control-overlay">
+                    <button id="checkboxRemove" class="control-button remove-button">x</button>
+                    <button id="checkboxAdd" class="control-button add-button">+</button>
+                    <button id="checkboxPrevious" class="control-button checkbox-prev">〈</button>
+                    <button id="checkboxNext" class="control-button checkbox-next">〉</button>
+                    <input id="checkboxName" class="control-button name-button" placeholder="Name...">
+                    <input id="checkboxSlices" type="number" class="control-button number-button" placeholder="6">
+                </div>
+                <div id="checkboxDisplay" class="checkbox-display carousel-container">
+                    <div id="checkboxCarousel" class="carousel-track"></div>
+                </div>
+            </div>
+            <div id="numberContainer" class="main-grid-cell" style="display: none;">
+                <div id="counterControls" class="control-overlay">
+                    <button id="counterRemove" class="control-button remove-button">x</button>
+                    <button id="counterAdd" class="control-button add-button">+</button>
+                    <button id="counterPrevious" class="control-button counter-prev">〈</button>
+                    <button id="counterNext" class="control-button counter-next">〉</button>
+                    <input id="counterName" class="control-button number-name-button" placeholder="Name...">
+                    <button id="counterReset" class="control-button counter-reset">Reset</button>
+                </div>
+                <div id="counterDisplay" class="counter-display carousel-container">
+                    <div id="counterCarousel" class="carousel-track"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>
