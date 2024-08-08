@@ -126,7 +126,6 @@ class Checkbox
         const svgWidth = numColumns * boxSize;
         const svgHeight = numRows * boxSize;
 
-        svg.setAttribute("aria-hidden", "true");
         svg.setAttribute("viewBox", `0 0 ${svgWidth} ${svgHeight}`);
         svg.setAttribute("width", `${svgWidth}px`);
         svg.setAttribute("height", `${svgHeight}px`);

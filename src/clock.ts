@@ -117,7 +117,6 @@ class Clocks
     private getClockSlices(numSlices: number)
     {
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        svg.setAttribute("aria-hidden", "true");
         svg.setAttribute("viewBox", "0 0 200 200");
         svg.setAttribute("width", "200px");
         svg.setAttribute("height", "200px");

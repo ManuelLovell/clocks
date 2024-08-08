@@ -122,7 +122,6 @@ class Counters
         const buttonHeight = 60;
         const spacing = 10; // Space between buttons and display
 
-        svg.setAttribute("aria-hidden", "true");
         svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
         svg.setAttribute("width", `${width}px`);
         svg.setAttribute("height", `${height}px`);
@@ -201,7 +200,6 @@ class Counters
         decrementGroup.appendChild(decrementText);
 
         // Event handlers
-        let count = 0;
 
         incrementGroup.addEventListener("click", () =>
         {
@@ -213,13 +211,10 @@ class Counters
 
         decrementGroup.addEventListener("click", () =>
         {
-            if (count > 0)
-            {
-                let current = parseInt(displayText.textContent ?? "0");
-                current--;
-                displayText.textContent = current.toString();
-                //console.log(`Decremented: ${current}`);
-            }
+            let current = parseInt(displayText.textContent ?? "0");
+            current--;
+            displayText.textContent = current.toString();
+            //console.log(`Decremented: ${current}`);
         });
 
         svg.appendChild(decrementGroup);
