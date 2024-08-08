@@ -116,6 +116,8 @@ class Clocks
 
     private getClockSlices(numSlices: number)
     {
+        const fixedNumber = Math.min(numSlices, 100);
+
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         svg.setAttribute("viewBox", "0 0 200 200");
         svg.setAttribute("width", "200px");
@@ -125,9 +127,9 @@ class Clocks
         const radius = 90;
         const centerX = 100;
         const centerY = 100;
-        const angleStep = (2 * Math.PI) / numSlices;
+        const angleStep = (2 * Math.PI) / fixedNumber;
 
-        for (let i = 0; i < numSlices; i++)
+        for (let i = 0; i < fixedNumber; i++)
         {
             const startAngle = i * angleStep;
             const endAngle = (i + 1) * angleStep;
@@ -150,7 +152,7 @@ class Clocks
             path.setAttribute("class", "slice");
             path.setAttribute("cut", i.toString());
             path.setAttribute("toggled", "0");
-            path.setAttribute("stroke", `hsl(${(360 / numSlices) * i}, 70%, 70%)`);
+            path.setAttribute("stroke", `hsl(${(360 / fixedNumber) * i}, 70%, 70%)`);
             path.addEventListener("click", () => toggleSlice(path));
 
             svg.appendChild(path);
