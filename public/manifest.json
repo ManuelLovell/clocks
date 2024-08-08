@@ -1,12 +1,12 @@
 {
-  "name": "Chronicle!",
-  "description": "Party-shared character sheet system for a variety of different games.",
-  "version": "1.0.3",
+  "name": "Count!",
+  "description": "Keep track of counting for counting while counting also box.",
+  "version": "0.0.1",
   "author": "Battle-System",
   "manifest_version": 1,
   "icon": "/logo.png",
   "action": {
-    "title": "Chronicle!",
+    "title": "Count!",
     "icon": "/logo.svg",
     "popover": "/",
     "height": 260,
