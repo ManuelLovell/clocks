@@ -327,14 +327,23 @@ input[type=number] {
     width: 25px;
     vertical-align: middle;
 }
-
-#whatsNewContainer {
+#patreonContainer
+{
+    border: 1px solid var(--foreground-color);
+    border-radius: 6px;
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 2px;
 }
 
-#whatsNewButton {
-    vertical-align: -webkit-baseline-middle;
+.patreon-clickable {
     cursor: pointer;
+    filter: var(--invert);
+    background-color: transparent !important;
+    border-style: none !important;
+    height: 20px;
+    width: 20px;
+    padding: 2px;
+    vertical-align: middle;
 }

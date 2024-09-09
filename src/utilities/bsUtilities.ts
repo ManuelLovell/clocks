@@ -1,24 +1,63 @@
 import OBR from "@owlbear-rodeo/sdk";
-import { Constants } from "./bsConstants";
+import { BSWhatsNewConstants } from "./bsPatreonConstants";
 
-export function GetWhatsNewButton()
+export let USER_REGISTERED = false;
+
+export function GetPatreonButton()
 {
     const newImgElement = document.createElement('img');
-    newImgElement.id = "whatsNewButton";
-    newImgElement.style.cursor = "pointer";
+    newImgElement.id = "PatreonButton";
     newImgElement.setAttribute('class', 'icon');
-    newImgElement.classList.add('clickable');
-    newImgElement.setAttribute('title', 'Whats New?');
-    newImgElement.setAttribute('src', '/w-info.svg');
-    newImgElement.onclick = async function ()
+    newImgElement.classList.add('patreon-clickable');
+    newImgElement.setAttribute('title', USER_REGISTERED ? 'Thanks for subscribing!' : 'Get the news on updates on the Battle-System Patreon');
+    newImgElement.setAttribute('src', USER_REGISTERED ? 'w-thankyou.svg' : '/w-patreon-2.png');
+    newImgElement.onclick = async function (e)
     {
-        await OBR.modal.open({
-            id: Constants.EXTENSIONWHATSNEW,
-            url: `/src/whatsnew/whatsnew.html?subscriber=${false}`,
-            height: 500,
-            width: 350,
-        });
-    };
+        e.preventDefault();
+        window.open("https://www.patreon.com/battlesystem", "_blank");
+    }
 
     return newImgElement;
+}
+
+export async function CheckRegistration()
+{
+    const owlbearId = await OBR.player.getId();
+    try
+    {
+        const debug = window.location.origin.includes("localhost") ? "eternaldream" : "";
+        const userid = {
+            owlbearid: owlbearId
+        };
+
+        const requestOptions = {
+            method: "POST",
+            headers: new Headers({
+                "Content-Type": "application/json",
+                "Authorization": BSWhatsNewConstants.ANONAUTH,
+                "x-manuel": debug
+            }),
+            body: JSON.stringify(userid),
+        };
+        const response = await fetch(BSWhatsNewConstants.CHECKREGISTRATION, requestOptions);
+
+        if (!response.ok)
+        {
+            const errorData = await response.json();
+            // Handle error data
+            console.error("Error:", errorData);
+            return;
+        }
+        const data = await response.json();
+        if (data.Data === "OK")
+        {
+            USER_REGISTERED = true;
+        }
+        else console.log("Not Registered");
+    }
+    catch (error)
+    {
+        // Handle errors
+        console.error("Error:", error);
+    }
 }

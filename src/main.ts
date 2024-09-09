@@ -14,17 +14,18 @@ const COUNTERCONTAINER = document.getElementById('numberContainer') as HTMLDivEl
 
 OBR.onReady(async () =>
 {
+    await Utilities.CheckRegistration();
     CLOCKS.SetupControls();
     CHECKBOX.SetupControls();
     COUNTERS.SetupControls();
     SetupToggles();
-    SetupWhatsNew();
+    SetupPatreon();
 });
 
-function SetupWhatsNew()
+function SetupPatreon()
 {
-    const whatsNewContainer = document.getElementById("whatsNewContainer")!;
-    whatsNewContainer.appendChild(Utilities.GetWhatsNewButton());
+    const patreonContainer = document.getElementById("patreonContainer")!;
+    patreonContainer.appendChild(Utilities.GetPatreonButton());
 }
 
 function SetupToggles()
