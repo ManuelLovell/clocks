@@ -1,7 +1,9 @@
+import { Constants } from "./utilities/bsConstants";
 
 class Counters
 {
     carouselIndex = 0;
+    saveState: SaveState[];
 
     ADD = document.getElementById('counterAdd') as HTMLButtonElement;
     REMOVE = document.getElementById('counterRemove') as HTMLButtonElement;
@@ -15,7 +17,8 @@ class Counters
 
     constructor()
     {
-
+        this.saveState = [];
+        this.localLoad();
     }
 
     public SetupControls()
@@ -30,6 +33,10 @@ class Counters
             newCounter.appendChild(this.getSvgNumberCounter());
             this.CAROUSELTRACK.appendChild(newCounter);
 
+            // Save State
+            const newState: SaveState = { Id: newCounter.id, Marked: [], Name: "", Total: 0 };
+            this.saveState.push(newState);
+
             // Find/Remove old selected
             const oldSelected = this.CAROUSELTRACK.getElementsByClassName('counter-selected');
             if (oldSelected.length > 0)
@@ -43,6 +50,7 @@ class Counters
             const newItem = carouselItems[this.carouselIndex];
             newItem.classList.add("counter-selected");
             this.updateCarousel();
+            this.localSave();
         };
         this.REMOVE.onclick = () =>
         {
@@ -72,6 +80,7 @@ class Counters
                     this.updateCarousel();
                 } else this.carouselIndex = 0;
             }
+            this.localSave();
         };
         this.PREV.onclick = () =>
         {
@@ -90,14 +99,17 @@ class Counters
             if (this.selectedCounter())
             {
                 const counterName = this.NAME.value;
+                this.selectedSave().Name = counterName;
                 this.selectedCounter().setAttribute("counter-name", counterName);
             }
+            this.localSave();
         };
         this.RESET.onclick = () =>
         {
             if (this.selectedCounter().querySelector('.display-text')?.textContent)
             {
                 this.selectedCounter().querySelector('.display-text')!.textContent = "0";
+                this.localSave();
             }
         };
     }
@@ -106,6 +118,8 @@ class Counters
     {
         const carouselItems = this.CAROUSELTRACK.children;
         const newVisible = carouselItems[this.carouselIndex];
+        if (!newVisible) return;
+
         newVisible.classList.add("counter-selected");
         const itemWidth = carouselItems[0].clientWidth;
         this.CAROUSELTRACK.style.transform = `translateX(-${this.carouselIndex * itemWidth}px)`;
@@ -153,7 +167,7 @@ class Counters
 
         // Increment button
         const incrementGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        incrementGroup.setAttribute("transform", `translate(20, 20)`);
+        incrementGroup.setAttribute("transform", `translate(20, 30)`);
 
         const incrementRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         incrementRect.setAttribute("width", `${buttonWidth}`);
@@ -177,7 +191,7 @@ class Counters
 
         // Decrement button
         const decrementGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        decrementGroup.setAttribute("transform", `translate(20, ${2 * buttonHeight + spacing * 2 + 10})`);
+        decrementGroup.setAttribute("transform", `translate(20, ${2 * buttonHeight + spacing * 2})`);
 
         const decrementRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         decrementRect.setAttribute("width", `${buttonWidth}`);
@@ -200,12 +214,12 @@ class Counters
         decrementGroup.appendChild(decrementText);
 
         // Event handlers
-
         incrementGroup.addEventListener("click", () =>
         {
             let current = parseInt(displayText.textContent ?? "0");
             current++;
             displayText.textContent = current.toString();
+            SaveState();
         });
 
         decrementGroup.addEventListener("click", () =>
@@ -213,7 +227,14 @@ class Counters
             let current = parseInt(displayText.textContent ?? "0");
             current--;
             displayText.textContent = current.toString();
+            SaveState();
         });
+
+        function SaveState()
+        {
+            COUNTERS.selectedSave().Total = parseInt(displayText.textContent ?? "0");
+            COUNTERS.localSave();
+        }
 
         svg.appendChild(incrementGroup);
         svg.appendChild(displayGroup);
@@ -224,6 +245,44 @@ class Counters
 
 
     private selectedCounter = () => this.CAROUSELTRACK.children[this.carouselIndex] as HTMLElement;
+    private selectedSave = () => this.saveState.find(x => x.Id === this.selectedCounter().id) as SaveState;
+    private localSave = () => localStorage.setItem(Constants.EXTENSIONID + "_Counters", JSON.stringify(this.saveState));
+    private localLoad()
+    {
+        const saveData = localStorage.getItem(Constants.EXTENSIONID + "_Counters");
+        if (saveData)
+        {
+            const unpacked = JSON.parse(saveData) as SaveState[]; // Parse the saved data back into an array of SaveState
+
+            this.saveState = [];
+            this.CAROUSELTRACK.innerHTML = '';
+
+            unpacked.forEach((state, _index) =>
+            {
+                const newCounter = document.createElement('div');
+                newCounter.id = state.Id;
+                newCounter.classList.add("carousel-item");
+                newCounter.appendChild(this.getSvgNumberCounter());
+
+                const displayText = newCounter.querySelector<SVGTextElement>('.display-text');
+                if (displayText)
+                {
+                    displayText.textContent = state.Total.toString();
+                }
+
+                newCounter.setAttribute("counter-name", state.Name);
+                this.saveState.push(state);
+
+                this.CAROUSELTRACK.appendChild(newCounter);
+            });
+
+            if (this.CAROUSELTRACK.children.length > 0)
+            {
+                this.carouselIndex = 0;
+                this.updateCarousel();
+            }
+        }
+    }
 }
 
 export const COUNTERS = new Counters();

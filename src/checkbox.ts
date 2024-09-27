@@ -1,6 +1,10 @@
+import { Constants } from "./utilities/bsConstants";
+
 class Checkbox
 {
     carouselIndex = 0;
+    defaultCheckbox = 4;
+    saveState: SaveState[];
 
     ADD = document.getElementById('checkboxAdd') as HTMLButtonElement;
     REMOVE = document.getElementById('checkboxRemove') as HTMLButtonElement;
@@ -14,7 +18,8 @@ class Checkbox
 
     constructor()
     {
-
+        this.saveState = [];
+        this.localLoad();
     }
 
     public SetupControls()
@@ -26,8 +31,12 @@ class Checkbox
             newCheckbox.id = crypto.randomUUID();
             newCheckbox.classList.add("checkbox-selected");
             newCheckbox.classList.add("carousel-item");
-            newCheckbox.appendChild(this.getSvgCheckboxes(4));
+            newCheckbox.appendChild(this.getSvgCheckboxes(this.defaultCheckbox));
             this.CAROUSELTRACK.appendChild(newCheckbox);
+
+            // Save State
+            const newState: SaveState = { Id: newCheckbox.id, Marked: [], Name: "", Total: this.defaultCheckbox };
+            this.saveState.push(newState);
 
             // Find/Remove old selected
             const oldSelected = this.CAROUSELTRACK.getElementsByClassName('checkbox-selected');
@@ -42,6 +51,7 @@ class Checkbox
             const newItem = carouselItems[this.carouselIndex];
             newItem.classList.add("checkbox-selected");
             this.updateCarousel();
+            this.localSave();
         };
         this.REMOVE.onclick = () =>
         {
@@ -71,6 +81,7 @@ class Checkbox
                     this.updateCarousel();
                 } else this.carouselIndex = 0;
             }
+            this.localSave();
         };
         this.PREV.onclick = () =>
         {
@@ -89,17 +100,21 @@ class Checkbox
             if (this.selectedCheckbox())
             {
                 const checkboxName = this.NAME.value;
+                this.selectedSave().Name = checkboxName;
                 this.selectedCheckbox().setAttribute("checkbox-name", checkboxName);
             }
+            this.localSave();
         };
         this.NUMBER.onblur = () =>
         {
             const newValue = parseInt(this.NUMBER.value);
             if (newValue > 0 && this.selectedCheckbox() !== undefined)
             {
+                this.selectedSave().Total = newValue;
                 this.selectedCheckbox().replaceChildren();
                 this.selectedCheckbox().appendChild(this.getSvgCheckboxes(newValue));
             }
+            this.localSave();
         };
     }
 
@@ -107,6 +122,8 @@ class Checkbox
     {
         const carouselItems = this.CAROUSELTRACK.children;
         const newVisible = carouselItems[this.carouselIndex];
+        if (!newVisible) return;
+
         newVisible.classList.add("checkbox-selected");
         const itemWidth = carouselItems[0].clientWidth;
         this.CAROUSELTRACK.style.transform = `translateX(-${this.carouselIndex * itemWidth}px)`;
@@ -149,12 +166,15 @@ class Checkbox
             rect.setAttribute("stroke-width", "2");
             rect.setAttribute("rx", "6");
             rect.setAttribute("ry", "6");
+            rect.setAttribute("box", i.toString());
             rect.setAttribute("class", "checkbox-rect");
 
             const checkmark = document.createElementNS("http://www.w3.org/2000/svg", "path");
             checkmark.setAttribute("d", "M221.65723,34.34326A8.00246,8.00246,0,0,0,216,32h-.02539l-63.79883.20117A8.00073,8.00073,0,0,0,146.0332,35.106L75.637,120.32275,67.31348,111.999A16.02162,16.02162,0,0,0,44.68555,112L32.001,124.68555A15.99888,15.99888,0,0,0,32,147.31348l20.88672,20.88769L22.94531,198.14258a16.01777,16.01777,0,0,0,.001,22.62695l12.28418,12.28418a16.00007,16.00007,0,0,0,22.62793,0L87.79883,203.1123,108.68652,224.001A16.02251,16.02251,0,0,0,131.31445,224L143.999,211.31445A15.99888,15.99888,0,0,0,144,188.68652l-8.32324-8.32324,85.21679-70.39648a8.00125,8.00125,0,0,0,2.90528-6.14258L224,40.02539A8.001,8.001,0,0,0,221.65723,34.34326Zm-13.84668,65.67822-83.49829,68.97706L111.314,156l54.34327-54.34277a8.00053,8.00053,0,0,0-11.31446-11.31446L100,144.686,87.00195,131.6875,155.97852,48.189l51.99609-.16357Z");
             checkmark.setAttribute("fill", "transparent");
             checkmark.setAttribute("stroke", "none");
+            checkmark.setAttribute("toggled", "0");
+            checkmark.setAttribute("check", i.toString());
             checkmark.setAttribute("class", "checkmark");
 
             const swordScaleFactor = 0.115; // Adjust this scale factor as needed
@@ -170,8 +190,24 @@ class Checkbox
 
         const toggleCheckbox = (checkmark: SVGPathElement) =>
         {
-            //const isChecked = checkmark.classList.contains('check-selected');
             checkmark.classList.toggle('check-selected');
+            checkmark.setAttribute("toggled", checkmark.classList.contains("check-selected") ? "1" : "0");
+
+            const newCheckData: { key: string, value: string }[] = [];
+            const htmlChecks = this.selectedCheckbox().querySelectorAll<SVGPathElement>('.checkmark');
+            htmlChecks.forEach(check =>
+            {
+                const checkValue = check.getAttribute('check')!;
+                const toggledState = check.getAttribute('toggled')!;
+
+                newCheckData.push({
+                    key: checkValue,
+                    value: toggledState
+                });
+            });
+
+            this.selectedSave().Marked = newCheckData;
+            this.localSave();
             //console.log(`Checkbox toggled: ${!isChecked}`);
         };
 
@@ -179,6 +215,55 @@ class Checkbox
     }
 
     private selectedCheckbox = () => this.CAROUSELTRACK.children[this.carouselIndex] as HTMLElement;
+    private selectedSave = () => this.saveState.find(x => x.Id === this.selectedCheckbox().id) as SaveState;
+    private localSave = () => localStorage.setItem(Constants.EXTENSIONID + "_Checkboxes", JSON.stringify(this.saveState));
+    private localLoad()
+    {
+        const saveData = localStorage.getItem(Constants.EXTENSIONID + "_Checkboxes");
+        if (saveData)
+        {
+            const unpacked = JSON.parse(saveData) as SaveState[]; // Parse the saved data back into an array of SaveState
+
+            this.saveState = [];
+            this.CAROUSELTRACK.innerHTML = '';
+
+            unpacked.forEach((state, _index) =>
+            {
+                const newCheckbox = document.createElement('div');
+                newCheckbox.id = state.Id;
+                newCheckbox.classList.add("carousel-item");
+                newCheckbox.appendChild(this.getSvgCheckboxes(state.Total));
+
+                const htmlSlices = newCheckbox.querySelectorAll<SVGPathElement>('.checkmark');
+                state.Marked.forEach(mark =>
+                {
+                    const checkbox = Array.from(htmlSlices).find(check => check.getAttribute('check') === mark.key);
+                    if (checkbox)
+                    {
+                        checkbox.setAttribute('toggled', mark.value);
+                        if (mark.value === "1")
+                        {
+                            checkbox.classList.add("check-selected");
+                        } else
+                        {
+                            checkbox.classList.remove("check-selected");
+                        }
+                    }
+                });
+
+                newCheckbox.setAttribute("checkbox-name", state.Name);
+                this.saveState.push(state);
+
+                this.CAROUSELTRACK.appendChild(newCheckbox);
+            });
+
+            if (this.CAROUSELTRACK.children.length > 0)
+            {
+                this.carouselIndex = 0;
+                this.updateCarousel();
+            }
+        }
+    }
 }
 
 export const CHECKBOX = new Checkbox();
