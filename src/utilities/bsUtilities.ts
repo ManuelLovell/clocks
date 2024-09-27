@@ -1,7 +1,13 @@
 import OBR from "@owlbear-rodeo/sdk";
+import * as uuid from 'uuid';
 import { BSWhatsNewConstants } from "./bsPatreonConstants";
 
 export let USER_REGISTERED = false;
+
+export function GetUUID()
+{
+    return uuid.v4();
+}
 
 export function GetPatreonButton()
 {

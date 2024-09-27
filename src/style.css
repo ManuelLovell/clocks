@@ -12,209 +12,237 @@
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
 
-    --background-color: #242424;
-    --foreground-color: white;
-    --soft-outline: rgb(65, 65, 65);
-    --invert: none;
-    --tooltip-background: none;
-
     --OBR-font: white;
-    --OBR-font-transparent: rgba(255, 255, 255, 0.493);
+    --OBR-font-transparent: rgba(255, 255, 255, 0.5);
+
     --OBR-offset-foreground: rgb(230, 230, 238);
     --OBR-offset-background: rgb(49, 49, 65);
-    --OBR-light-blue: rgb(60, 62, 75);
+
+    --OBR-light-blue: rgb(68, 71, 83);
     --OBR-light-blue-transparent: rgb(60, 62, 75, 0.5);
+
     --OBR-dark-blue: rgb(30, 34, 49);
     --OBR-dark-blue-transparent: rgba(30, 34, 49, 0.5);
+
+    --OBR-dark-purple: rgb(58, 30, 38);
     --OBR-dark-purple-transparent: rgba(58, 30, 38, 0.5);
+
     --OBR-Purple-Select: rgb(187, 153, 255);
     --OBR-Purple-Select-transparent: rgb(187, 153, 255, 0.5);
 
-    --OBR-Grey-Outline: rgba(128, 128, 128, 0.507);
-    --BS-red: #A73335;
+    --BS-Pink: #cf3470;
+    --background-color: #242424;
+    --foreground-color: white;
+    --soft-outline: rgb(110, 110, 110);
+
+    --invert: none;
 }
 
 @media (prefers-color-scheme: light) {
     :root {
+        --OBR-font: black;
+        --OBR-font-transparent: rgba(0, 0, 0, 0.5);
+
         --OBR-offset-foreground: rgb(44, 44, 46);
         --OBR-offset-background: rgb(210, 210, 223);
+
         --OBR-light-blue: rgb(231, 233, 238);
         --OBR-light-blue-transparent: rgb(231, 233, 238, 0.5);
+
         --OBR-dark-blue: rgb(183, 184, 189);
         --OBR-dark-blue-transparent: rgba(183, 184, 189, 0.5);
+
         --OBR-Purple-Select: rgb(153, 102, 255);
         --OBR-Purple-Select-transparent: rgb(153, 102, 255, 0.5);
+
+        --OBR-dark-purple: rgb(236, 156, 178);
         --OBR-dark-purple-transparent: rgba(236, 156, 178, 0.5);
 
-        --OBR-font: black;
-        --OBR-font-transparent: rgba(0, 0, 0, 0.493);
+        --foreground-color: #242424;
+        --background-color: white;
+        --soft-outline: rgb(146, 146, 146);
+
         --invert: invert(1);
-        --invert-click: none;
-        --slider-color: #4b4b4b;
     }
 }
 
-body {
-    margin: 0;
+html {
+    height: 100%;
     display: flex;
+}
+
+body {
+    width: 100%;
 }
 
 #app {
-    padding: .5rem;
-    width: 100%;
     height: 100%;
-    text-align: center;
-    border-radius: 16px;
-    scrollbar-gutter: stable both-edges;
-}
-
-.main-grid {
-    border: 1px solid transparent;
-    border-radius: 6px;
-}
-
-.main-grid-cell {
-    display: grid;
-    height: 200px;
     width: 100%;
+    scrollbar-gutter: stable;
 }
 
-.control-overlay {
-    position: relative;
-    pointer-events: none;
-}
-
-.counter-display,
-.checkbox-display,
-.clock-display {
-    align-content: center;
-}
-
-.counter-display,
-.control-overlay,
-.checkbox-display,
-.clock-display {
-    grid-area: 1/1;
-}
-
-#tabControls {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 6px;
-}
 
 /* Buttons */
-input,
-button {
-    font-weight: bold;
-    cursor: pointer;
-    background-color: var(--OBR-dark-blue-transparent);
-    border-radius: 6px;
-    border: 1px solid var(--OBR-font);
+select,
+button,
+input {
+    vertical-align: middle;
+    box-sizing: border-box;
     color: var(--OBR-font);
+    background-color: var(--OBR-light-blue);
     padding: 6px;
-    width: 50px;
+    border: none;
+    border-radius: 4px;
+    height: 100%;
+    width: 100%;
+    font-weight: bold;
+    font-variant: small-caps;
+    cursor: pointer;
+    overflow: hidden;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin: 2px;
 }
 
-.view-button {
-    width: 100% !important;
-    margin: 0 4px;
+select:hover,
+button:hover,
+input[type=button]:hover {
+    background-color: var(--OBR-Purple-Select);
 }
 
-.view-button.selected,
+select option {
+    background-color: var(--OBR-light-blue);
+}
+
+input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 100%;
+    background: var(--OBR-light-blue);
+    outline: none;
+    padding: 0;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 4px;
+    background: var(--OBR-Purple-Select);
+    cursor: pointer;
+}
+
+/* Firefox */
+input[type=range]::-moz-range-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 4px;
+    background: var(--OBR-Purple-Select);
+    cursor: pointer;
+}
+
+/* Optional: Change the track's appearance */
+input[type=range]::-webkit-slider-runnable-track {
+    background: var(--OBR-light-blue);
+    height: 10px;
+}
+
+input[type=range]::-moz-range-track {
+    background: var(--OBR-light-blue);
+    height: 20px;
+}
+
+input[type=text] {
+    cursor: text;
+    background-color: transparent;
+    border: 2px solid var(--OBR-light-blue);
+    font-weight: 800;
+}
+
+/* Remove number slider */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+/* Scroll Bars */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background-color: var(--OBR-dark-blue);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: var(--OBR-Purple-Select);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: var(--OBR-Purple-Select);
+}
+
+/* Custom Styling */
+.grid-container {
+    height: 90%;
+    width: 93%;
+    padding: 6px;
+    display: grid;
+    grid-template-columns: 20% 20% 20% 20% 20%;
+    grid-template-rows: 20% 20% 20% 20% 20%;
+    gap: 2px;
+}
+
+.control-button
+{
+    background-color: transparent;
+}
+.button-svg
+{
+    height: 100%;
+}
+
+.selected,
 button:hover {
     background-color: var(--OBR-Purple-Select-transparent);
 }
 
-.control-button {
-    pointer-events: auto;
-    border: 1px solid var(--OBR-Grey-Outline) !important;
+.max
+{
+    width: 100%;
+    height: 84%;
+}
+.pos-relative {
+    position: relative;
+    width: 100%;
+    height: 100%;
 }
 
-.add-button,
-.remove-button {
-    position: absolute;
-    top: 0px;
-    height: 35px;
-    font-family: 'Menlo', 'Lucida Console', 'Monaco', 'Consolas', monospace;
-    font-size: x-large;
-}
-
-.add-button {
-    right: 0px;
-}
-
-.remove-button {
-    left: 0px;
-}
-
-.checkbox-next,
-.checkbox-prev,
-.clock-next,
-.clock-prev {
-    font-family: 'Menlo', 'Lucida Console', 'Monaco', 'Consolas', monospace;
-    font-size: x-large;
-    position: absolute;
-    text-align: center;
-    width: 40px;
-    height: 60px;
-    border-color: var(--OBR-Grey-Outline) !important;
-    top: 35%;
-    justify-content: center;
-}
-
-
-.checkbox-next,
-.clock-next {
-    right: 0px;
-}
-
-.checkbox-prev,
-.clock-prev {
-    left: 0px;
-}
-
-.counter-next,
-.counter-prev {
+.pos-absolute {
+    position: fixed;
+    display: flex;
+    width: 100%;
+    top: 45px;
+    left: 0;
     bottom: 0;
-    position: absolute;
-}
-
-.counter-next {
-    right: 0px;
-}
-
-.counter-prev {
-    left: 0px;
-}
-
-.number-button {
-    position: absolute;
-    cursor: text;
-    bottom: 0px;
-    right: 0px;
-    height: 30px;
-    width: 40px;
-    text-align: center;
-}
-
-.name-button {
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
-    height: 30px;
-    width: 40px;
-    text-align: center;
-}
-
-.number-name-button {
-    position: absolute;
-    bottom: 0px;
-    left: 40%;
 }
 
 /* Clocks */
-
 .checkbox-svg {
     max-height: 140px;
     width: 100%;
@@ -267,6 +295,8 @@ path.path-selected {
 /* Carousel */
 .carousel-container {
     width: 100%;
+    text-align: center;
+    align-content: center;
     overflow: hidden;
     position: relative;
     margin: 0 auto;
@@ -283,18 +313,6 @@ path.path-selected {
     min-width: 100%;
     box-sizing: border-box;
     pointer-events: none;
-}
-
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-/* Firefox */
-input[type=number] {
-    -moz-appearance: textfield;
-    appearance: textfield;
 }
 
 /* Whats New */
@@ -327,9 +345,9 @@ input[type=number] {
     width: 25px;
     vertical-align: middle;
 }
-#patreonContainer
-{
-    border: 1px solid var(--foreground-color);
+
+#patreonContainer {
+    border: 1px solid var(--OBR-font);
     border-radius: 6px;
     display: flex;
     justify-content: center;

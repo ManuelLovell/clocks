@@ -9,11 +9,13 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@types/uuid": "^10.0.0",
     "typescript": "^5.2.2",
     "vite": "^5.3.4"
   },
   "dependencies": {
     "@owlbear-rodeo/sdk": "^2.4.0",
-    "flickity": "^3.0.0"
+    "flickity": "^3.0.0",
+    "uuid": "^10.0.0"
   }
 }

@@ -1,7 +1,10 @@
+import { Constants } from "./utilities/bsConstants";
 
 class Clocks
 {
+    defaultClock = 6;
     carouselIndex = 0;
+    saveState: SaveState[];
 
     ADD = document.getElementById('clockAdd') as HTMLButtonElement;
     REMOVE = document.getElementById('clockRemove') as HTMLButtonElement;
@@ -15,7 +18,8 @@ class Clocks
 
     constructor()
     {
-
+        this.saveState = [];
+        this.localLoad();
     }
 
     public SetupControls()
@@ -27,8 +31,12 @@ class Clocks
             newClock.id = crypto.randomUUID();
             newClock.classList.add("clock-selected");
             newClock.classList.add("carousel-item");
-            newClock.appendChild(this.getClockSlices(6));
+            newClock.appendChild(this.getClockSlices(this.defaultClock));
             this.CAROUSELTRACK.appendChild(newClock);
+
+            // Save State
+            const newState: SaveState = { Id: newClock.id, Marked: [], Name: "", Total: this.defaultClock };
+            this.saveState.push(newState);
 
             // Find/Remove old selected
             const oldSelected = this.CAROUSELTRACK.getElementsByClassName('clock-selected');
@@ -43,12 +51,14 @@ class Clocks
             const newItem = carouselItems[this.carouselIndex];
             newItem.classList.add("clock-selected");
             this.updateCarousel();
+            this.localSave();
         };
         this.REMOVE.onclick = () =>
         {
             const selected = this.CAROUSELTRACK.getElementsByClassName('clock-selected');
             if (selected.length > 0)
             {
+                this.saveState = this.saveState.filter(x => x.Id !== selected[0].id);
                 selected[0].remove();
             }
 
@@ -72,6 +82,7 @@ class Clocks
                     this.updateCarousel();
                 } else this.carouselIndex = 0;
             }
+            this.localSave();
         };
         this.PREV.onclick = () =>
         {
@@ -90,17 +101,22 @@ class Clocks
             if (this.selectedClock())
             {
                 const clockName = this.NAME.value;
+
+                this.selectedSave().Name = clockName;
                 this.selectedClock().setAttribute("clock-name", clockName);
             }
+            this.localSave();
         };
         this.NUMBER.onblur = () =>
         {
             const newValue = parseInt(this.NUMBER.value);
             if (newValue > 0 && this.selectedClock() !== undefined)
             {
+                this.selectedSave().Total = newValue;
                 this.selectedClock().replaceChildren();
                 this.selectedClock().appendChild(this.getClockSlices(newValue));
             }
+            this.localSave();
         };
     }
 
@@ -108,6 +124,8 @@ class Clocks
     {
         const carouselItems = this.CAROUSELTRACK.children;
         const newVisible = carouselItems[this.carouselIndex];
+        if (!newVisible) return;
+        
         newVisible.classList.add("clock-selected");
         const itemWidth = carouselItems[0].clientWidth;
         this.CAROUSELTRACK.style.transform = `translateX(-${this.carouselIndex * itemWidth}px)`;
@@ -161,12 +179,79 @@ class Clocks
         const toggleSlice = (path: SVGPathElement) => 
         {
             path.classList.toggle("path-selected");
-           //console.log(`Slice Toggled: ${path.getAttribute("cut")} = ${path.classList.contains("path-selected")}`);
+            path.setAttribute("toggled", path.classList.contains("path-selected") ? "1" : "0");
+
+            const newSliceData: { key: string, value: string }[] = [];
+            const htmlSlices = this.selectedClock().querySelectorAll<SVGPathElement>('.slice');
+            htmlSlices.forEach(slice =>
+            {
+                const cutValue = slice.getAttribute('cut')!;
+                const toggledState = slice.getAttribute('toggled')!;
+
+                newSliceData.push({
+                    key: cutValue,
+                    value: toggledState
+                });
+            });
+
+            this.selectedSave().Marked = newSliceData;
+            this.localSave();
+            //console.log(`Slice Toggled: ${path.getAttribute("cut")} = ${path.classList.contains("path-selected")}`);
         }
         return svg;
     }
 
     private selectedClock = () => this.CAROUSELTRACK.children[this.carouselIndex] as HTMLElement;
+    private selectedSave = () => this.saveState.find(x => x.Id === this.selectedClock().id) as SaveState;
+    private localSave = () => localStorage.setItem(Constants.EXTENSIONID + "_Clocks", JSON.stringify(this.saveState));
+    private localLoad()
+    {
+        const saveData = localStorage.getItem(Constants.EXTENSIONID + "_Clocks");
+        if (saveData)
+        {
+            const unpacked = JSON.parse(saveData) as SaveState[]; // Parse the saved data back into an array of SaveState
+
+            this.saveState = [];
+            this.CAROUSELTRACK.innerHTML = '';
+
+            unpacked.forEach((state, _index) =>
+            {
+                const newClock = document.createElement('div');
+                newClock.id = state.Id;
+                newClock.classList.add("carousel-item");
+                newClock.appendChild(this.getClockSlices(state.Total));
+
+                const htmlSlices = newClock.querySelectorAll<SVGPathElement>('.slice');
+                state.Marked.forEach(mark =>
+                {
+                    const slice = Array.from(htmlSlices).find(slice => slice.getAttribute('cut') === mark.key);
+                    if (slice)
+                    {
+                        slice.setAttribute('toggled', mark.value);
+                        if (mark.value === "1")
+                        {
+                            slice.classList.add("path-selected");
+                        } else
+                        {
+                            slice.classList.remove("path-selected");
+                        }
+                    }
+                });
+
+                newClock.setAttribute("clock-name", state.Name);
+                this.saveState.push(state);
+
+                this.CAROUSELTRACK.appendChild(newClock);
+            });
+
+            if (this.CAROUSELTRACK.children.length > 0)
+            {
+                this.carouselIndex = 0;
+                this.updateCarousel();
+            }
+        }
+    }
+
 }
 
 export const CLOCKS = new Clocks();
