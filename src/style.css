@@ -199,7 +199,7 @@ input[type=number] {
 
 /* Custom Styling */
 .grid-container {
-    height: 93%;
+    height: 90%;
     width: 93%;
     padding: 6px;
     display: grid;
@@ -208,9 +208,13 @@ input[type=number] {
     gap: 2px;
 }
 
+.control-button
+{
+    background-color: transparent;
+}
 .button-svg
 {
-    height: 40px;
+    height: 100%;
 }
 
 .selected,
@@ -218,8 +222,15 @@ button:hover {
     background-color: var(--OBR-Purple-Select-transparent);
 }
 
+.max
+{
+    width: 100%;
+    height: 84%;
+}
 .pos-relative {
     position: relative;
+    width: 100%;
+    height: 100%;
 }
 
 .pos-absolute {
@@ -284,6 +295,8 @@ path.path-selected {
 /* Carousel */
 .carousel-container {
     width: 100%;
+    text-align: center;
+    align-content: center;
     overflow: hidden;
     position: relative;
     margin: 0 auto;
@@ -334,7 +347,7 @@ path.path-selected {
 }
 
 #patreonContainer {
-    border: 1px solid var(--soft-outline);
+    border: 1px solid var(--OBR-font);
     border-radius: 6px;
     display: flex;
     justify-content: center;

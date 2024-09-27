@@ -33,7 +33,7 @@ function SetupToggles()
     CLOCKTOGGLE.onclick = () =>
     {
         CLOCKTOGGLE.classList.add("selected");
-        CLOCKCONTAINER.style.display = "grid";
+        CLOCKCONTAINER.style.display = "block";
 
         CHECKTOGGLE.classList.remove("selected");
         CHECKBOXCONTAINER.style.display = "none";
@@ -43,7 +43,7 @@ function SetupToggles()
     CHECKTOGGLE.onclick = () =>
     {
         CHECKTOGGLE.classList.add("selected");
-        CHECKBOXCONTAINER.style.display = "grid";
+        CHECKBOXCONTAINER.style.display = "block";
 
         CLOCKTOGGLE.classList.remove("selected");
         CLOCKCONTAINER.style.display = "none";
@@ -53,7 +53,7 @@ function SetupToggles()
     COUNTERTOGGLE.onclick = () =>
     {
         COUNTERTOGGLE.classList.add("selected");
-        COUNTERCONTAINER.style.display = "grid";
+        COUNTERCONTAINER.style.display = "block";
 
         CHECKTOGGLE.classList.remove("selected");
         CHECKBOXCONTAINER.style.display = "none";

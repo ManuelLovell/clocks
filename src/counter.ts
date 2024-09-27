@@ -115,12 +115,13 @@ class Counters
     private getSvgNumberCounter(): SVGSVGElement
     {
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        const width = 200;
-        const height = 100;
-        const buttonWidth = 40;
+        const width = 120;
+        const height = 240;
+        const buttonWidth = 80;
         const displayWidth = 100;
+        const crementButtonHeight = 30;
         const buttonHeight = 60;
-        const spacing = 10; // Space between buttons and display
+        const spacing = 5; // Space between buttons and display
 
         svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
         svg.setAttribute("width", `${width}px`);
@@ -128,8 +129,7 @@ class Counters
 
         // Counter display
         const displayGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        displayGroup.setAttribute("transform", `translate(${buttonWidth + spacing}, 20)`);
-
+        displayGroup.setAttribute("transform", `translate(10, ${buttonHeight + spacing})`);
 
         const displayRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         displayRect.setAttribute("width", `${displayWidth}`);
@@ -153,11 +153,11 @@ class Counters
 
         // Increment button
         const incrementGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        incrementGroup.setAttribute("transform", `translate(${width - buttonWidth}, 20)`);
+        incrementGroup.setAttribute("transform", `translate(20, 20)`);
 
         const incrementRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         incrementRect.setAttribute("width", `${buttonWidth}`);
-        incrementRect.setAttribute("height", `${buttonHeight}`);
+        incrementRect.setAttribute("height", `${crementButtonHeight}`);
         incrementRect.setAttribute("stroke-width", "2");
         incrementRect.setAttribute("rx", "6");
         incrementRect.setAttribute("ry", "6");
@@ -165,7 +165,7 @@ class Counters
 
         const incrementText = document.createElementNS("http://www.w3.org/2000/svg", "text");
         incrementText.setAttribute("x", `${buttonWidth / 2}`);
-        incrementText.setAttribute("y", `${buttonHeight / 2 + 10}`);
+        incrementText.setAttribute("y", `${crementButtonHeight / 2 + 10}`);
         incrementText.setAttribute("text-anchor", "middle");
         incrementText.setAttribute("font-size", "24");
         incrementText.setAttribute("font-family", "Arial, sans-serif");
@@ -177,11 +177,11 @@ class Counters
 
         // Decrement button
         const decrementGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        decrementGroup.setAttribute("transform", `translate(0, 20)`);
+        decrementGroup.setAttribute("transform", `translate(20, ${2 * buttonHeight + spacing * 2 + 10})`);
 
         const decrementRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         decrementRect.setAttribute("width", `${buttonWidth}`);
-        decrementRect.setAttribute("height", `${buttonHeight}`);
+        decrementRect.setAttribute("height", `${crementButtonHeight}`);
         decrementRect.setAttribute("stroke-width", "2");
         decrementRect.setAttribute("rx", "6");
         decrementRect.setAttribute("ry", "6");
@@ -189,7 +189,7 @@ class Counters
 
         const decrementText = document.createElementNS("http://www.w3.org/2000/svg", "text");
         decrementText.setAttribute("x", `${buttonWidth / 2}`);
-        decrementText.setAttribute("y", `${buttonHeight / 2 + 10}`);
+        decrementText.setAttribute("y", `${crementButtonHeight / 2 + 10}`);
         decrementText.setAttribute("text-anchor", "middle");
         decrementText.setAttribute("font-size", "24");
         decrementText.setAttribute("font-family", "Arial, sans-serif");
@@ -206,7 +206,6 @@ class Counters
             let current = parseInt(displayText.textContent ?? "0");
             current++;
             displayText.textContent = current.toString();
-            //console.log(`Incremented: ${current}`);
         });
 
         decrementGroup.addEventListener("click", () =>
@@ -214,15 +213,15 @@ class Counters
             let current = parseInt(displayText.textContent ?? "0");
             current--;
             displayText.textContent = current.toString();
-            //console.log(`Decremented: ${current}`);
         });
 
-        svg.appendChild(decrementGroup);
-        svg.appendChild(displayGroup);
         svg.appendChild(incrementGroup);
+        svg.appendChild(displayGroup);
+        svg.appendChild(decrementGroup);
 
         return svg;
     }
+
 
     private selectedCounter = () => this.CAROUSELTRACK.children[this.carouselIndex] as HTMLElement;
 }

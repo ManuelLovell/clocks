@@ -2,6 +2,7 @@
 class Clocks
 {
     carouselIndex = 0;
+    saveState: SaveState[];
 
     ADD = document.getElementById('clockAdd') as HTMLButtonElement;
     REMOVE = document.getElementById('clockRemove') as HTMLButtonElement;
@@ -15,7 +16,7 @@ class Clocks
 
     constructor()
     {
-
+        this.saveState = [];
     }
 
     public SetupControls()
@@ -161,7 +162,7 @@ class Clocks
         const toggleSlice = (path: SVGPathElement) => 
         {
             path.classList.toggle("path-selected");
-           //console.log(`Slice Toggled: ${path.getAttribute("cut")} = ${path.classList.contains("path-selected")}`);
+            //console.log(`Slice Toggled: ${path.getAttribute("cut")} = ${path.classList.contains("path-selected")}`);
         }
         return svg;
     }

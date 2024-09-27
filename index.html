@@ -28,7 +28,7 @@
                 </tr>
             </tbody>
         </table>
-        <div>
+        <div class="max">
             <div id="clockContainer" class="pos-relative">
                 <div id="clockControls" class="pos-absolute">
                     <div class="grid-container">
@@ -38,12 +38,25 @@
                         <div></div>
                         <div><button id="clockAdd" class="control-button add-button"><img class='button-svg' src="./add-button.svg"></button></div>
 
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+
                         <div><button id="clockNext" class="control-button clock-next"><img class='button-svg' src="./forward-button.svg"></button></div>
                         <div></div>
                         <div></div>
                         <div></div>
                         <div><button id="clockPrevious" class="control-button clock-prev"><img class='button-svg' src="./back-button.svg">&nbsp;</button></div>
-                        <div><input id="clockName" class="control-button name-button" placeholder="Name..."></div>
+                        
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+
+                        <div style="grid-column:1 / 3;"><input id="clockName" class="control-button name-button" placeholder="Name..."></div>
                         <div></div>
                         <div></div>
                         <div><input id="clockSlices" type="number" class="control-button number-button" placeholder="6"></div>
@@ -53,29 +66,77 @@
                     <div id="clockCarousel" class="carousel-track"></div>
                 </div>
             </div>
-            <div id="checkboxContainer" class="main-grid-cell" style="display: none;">
-                <div id="checkboxControls" class="control-overlay">
-                    <button id="checkboxRemove" class="control-button remove-button">x</button>
-                    <button id="checkboxAdd" class="control-button add-button">+</button>
-                    <button id="checkboxPrevious" class="control-button checkbox-prev">〈</button>
-                    <button id="checkboxNext" class="control-button checkbox-next">〉</button>
-                    <input id="checkboxName" class="control-button name-button" placeholder="Name...">
-                    <input id="checkboxSlices" type="number" class="control-button number-button" placeholder="6">
+            <div id="checkboxContainer" class="pos-relative" style="display: none;">
+                <div id="checkboxControls" class="pos-absolute">
+                    <div class="grid-container">
+                        <div><button id="checkboxRemove" class="control-button remove-button"><img class='button-svg' src="./remove-button.svg"></button></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div><button id="checkboxAdd" class="control-button add-button"><img class='button-svg' src="./add-button.svg"></button></div>
+
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+
+                        <div><button id="checkboxNext" class="control-button checkbox-next"><img class='button-svg' src="./forward-button.svg"></button></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div><button id="checkboxPrevious" class="control-button checkbox-prev"><img class='button-svg' src="./back-button.svg">&nbsp;</button></div>
+                        
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+
+                        <div style="grid-column:1 / 3;"><input id="checkboxName" class="control-button name-button" placeholder="Name..."></div>
+                        <div></div>
+                        <div></div>
+                        <div><input id="checkboxSlices" type="number" class="control-button number-button" placeholder="6"></div>
+                    </div>
                 </div>
-                <div id="checkboxDisplay" class="checkbox-display carousel-container">
+                <div id="checkboxDisplay" class="checkbox-display carousel-container pos-relative">
                     <div id="checkboxCarousel" class="carousel-track"></div>
                 </div>
             </div>
-            <div id="numberContainer" class="main-grid-cell" style="display: none;">
-                <div id="counterControls" class="control-overlay">
-                    <button id="counterRemove" class="control-button remove-button">x</button>
-                    <button id="counterAdd" class="control-button add-button">+</button>
-                    <button id="counterPrevious" class="control-button counter-prev">〈</button>
-                    <button id="counterNext" class="control-button counter-next">〉</button>
-                    <input id="counterName" class="control-button number-name-button" placeholder="Name...">
-                    <button id="counterReset" class="control-button counter-reset">Reset</button>
+            <div id="numberContainer" class="pos-relative" style="display: none;">
+                <div id="counterControls" class="pos-absolute">
+                    <div class="grid-container">
+                        <div><button id="counterRemove" class="control-button remove-button"><img class='button-svg' src="./remove-button.svg"></button></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div><button id="counterAdd" class="control-button add-button"><img class='button-svg' src="./add-button.svg"></button></div>
+
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+
+                        <div><button id="counterNext" class="control-button counter-next"><img class='button-svg' src="./forward-button.svg"></button></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div><button id="counterPrevious" class="control-button counter-prev"><img class='button-svg' src="./back-button.svg">&nbsp;</button></div>
+                        
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+
+                        <div style="grid-column:1 / 3;"><input id="counterName" class="control-button name-button" placeholder="Name..."></div>
+                        <div></div>
+                        <div></div>
+                        <div><button id="counterReset" class="control-button counter-reset">Reset</button></div>
+                    </div>
                 </div>
-                <div id="counterDisplay" class="counter-display carousel-container">
+                <div id="counterDisplay" class="counter-display carousel-container pos-relative">
                     <div id="counterCarousel" class="carousel-track"></div>
                 </div>
             </div>
