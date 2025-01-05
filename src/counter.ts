@@ -256,7 +256,6 @@ class Counters
         {
             COUNTERS.selectedSave().Total = parseInt(displayText.textContent ?? "0");
             COUNTERS.localSave();
-            await COUNTERS.UpdatePins();
         }
 
         if (!disableToggle) svg.appendChild(incrementGroup);
@@ -277,7 +276,11 @@ class Counters
 
     private selectedCounter = () => this.CAROUSELTRACK.children[this.carouselIndex] as HTMLElement;
     private selectedSave = () => this.saveState.find(x => x.Id === this.selectedCounter().id) as SaveState;
-    private localSave = () => localStorage.setItem(Constants.EXTENSIONID + "_Counters", JSON.stringify(this.saveState));
+    private localSave = async () => 
+    {
+        localStorage.setItem(Constants.EXTENSIONID + "_Counters", JSON.stringify(this.saveState));
+        await this.UpdatePins();
+    };
     private localLoad()
     {
         const saveData = localStorage.getItem(Constants.EXTENSIONID + "_Counters");

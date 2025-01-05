@@ -41,7 +41,7 @@ OBR.onReady(() =>
         {
             currentModel.Name = newState.Name;
             currentModel.Total = newState.Total.toString();
-            currentModel.Marked = newState.Marked;
+            currentModel.Marked = newState.Marked ?? [];
 
             RefreshCounter();
         }

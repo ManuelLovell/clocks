@@ -37,13 +37,14 @@ OBR.onReady(async () =>
         OBR.broadcast.onMessage(Constants.BROADCASTAWAITID, async (data) =>
         {
             const sw = await OBR.viewport.getWidth();
+            const mobile = sw < 400;
             await OBR.popover.close(Constants.PINNEDID);
             await OBR.popover.open({
                 id: Constants.PINNEDID,
                 url: data.data as string,
                 height: 160,
                 width: 160,
-                anchorPosition: { top: 20, left: sw - 80 },
+                anchorPosition: { top: mobile ? 50 : 20, left: mobile ? (sw - 60) :  (sw - 80) },
                 anchorReference: "POSITION",
                 anchorOrigin: {
                     vertical: "TOP",

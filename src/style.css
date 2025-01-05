@@ -300,7 +300,8 @@ path.path-selected {
 /* Carousel */
 .carousel-container {
     width: 100%;
-    max-width: 284px; /* Bandaid for more than 2 Number counts*/
+    max-width: 284px;
+    /* Bandaid for more than 2 Number counts*/
     text-align: center;
     align-content: center;
     overflow: hidden;
@@ -446,10 +447,13 @@ path.path-selected {
     font-weight: bolder;
     width: 90%;
     text-align: center;
-    text-shadow: 
-      -2px -2px 0 var(--OBR-offset-background), /* Top-left */
-      2px -2px 0 var(--OBR-offset-background),  /* Top-right */
-      -2px 2px 0 var(--OBR-offset-background),  /* Bottom-left */
-      2px 2px 0 var(--OBR-offset-background);   /* Bottom-right */
-  }
+    text-shadow:
+        -2px -2px 0 var(--OBR-offset-background),
+        /* Top-left */
+        2px -2px 0 var(--OBR-offset-background),
+        /* Top-right */
+        -2px 2px 0 var(--OBR-offset-background),
+        /* Bottom-left */
+        2px 2px 0 var(--OBR-offset-background);
+    /* Bottom-right */
 }

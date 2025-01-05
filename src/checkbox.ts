@@ -135,6 +135,7 @@ class Checkbox
                 this.selectedSave().Total = newValue;
                 this.selectedCheckbox().replaceChildren();
                 this.selectedCheckbox().appendChild(this.GetSvgCheckboxes(newValue));
+                this.selectedSave().Marked = [];
             }
             this.localSave();
         };
@@ -230,7 +231,6 @@ class Checkbox
 
             this.selectedSave().Marked = newCheckData;
             this.localSave();
-            await this.UpdatePins();
             //console.log(`Checkbox toggled: ${!isChecked}`);
         };
 
@@ -248,7 +248,11 @@ class Checkbox
 
     private selectedCheckbox = () => this.CAROUSELTRACK.children[this.carouselIndex] as HTMLElement;
     private selectedSave = () => this.saveState.find(x => x.Id === this.selectedCheckbox().id) as SaveState;
-    private localSave = () => localStorage.setItem(Constants.EXTENSIONID + "_Checkboxes", JSON.stringify(this.saveState));
+    private localSave = async () =>
+    {
+        localStorage.setItem(Constants.EXTENSIONID + "_Checkboxes", JSON.stringify(this.saveState))
+        await this.UpdatePins();
+    };
     private localLoad()
     {
         const saveData = localStorage.getItem(Constants.EXTENSIONID + "_Checkboxes");

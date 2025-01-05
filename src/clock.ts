@@ -137,6 +137,7 @@ class Clocks
                 this.selectedSave().Total = newValue;
                 this.selectedClock().replaceChildren();
                 this.selectedClock().appendChild(this.GetClockSlices(newValue));
+                this.selectedSave().Marked = [];
             }
             this.localSave();
         };
@@ -218,7 +219,6 @@ class Clocks
 
             this.selectedSave().Marked = newSliceData;
             this.localSave();
-            await this.UpdatePins();
             //console.log(`Slice Toggled: ${path.getAttribute("cut")} = ${path.classList.contains("path-selected")}`);
         }
         return svg;
@@ -234,7 +234,11 @@ class Clocks
 
     private selectedClock = () => this.CAROUSELTRACK.children[this.carouselIndex] as HTMLElement;
     private selectedSave = () => this.saveState.find(x => x.Id === this.selectedClock().id) as SaveState;
-    private localSave = () => localStorage.setItem(Constants.EXTENSIONID + "_Clocks", JSON.stringify(this.saveState));
+    private localSave = async () =>
+    {
+        localStorage.setItem(Constants.EXTENSIONID + "_Clocks", JSON.stringify(this.saveState));
+        await this.UpdatePins();
+    };
     private localLoad()
     {
         const saveData = localStorage.getItem(Constants.EXTENSIONID + "_Clocks");
