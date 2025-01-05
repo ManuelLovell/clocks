@@ -68,8 +68,19 @@ class Checkbox
             this.PIN.onclick = async () =>
             {
                 if (this.selectedCheckbox()?.id)
-                    // Send the model state for the Pinned window
-                    await OBR.broadcast.sendMessage(Constants.BROADCASTAWAITID, `/pinned.html?modelid=${encodeURIComponent(this.selectedSave().Id)}&modelname=${encodeURIComponent(this.selectedSave().Name)}&modeltotal=${encodeURIComponent(this.selectedSave().Total)}&modelmarked=${encodeURIComponent(JSON.stringify(this.selectedSave().Marked))}&modeltype=checkbox`);
+                {
+                    const playerCount = await OBR.party.getPlayers();
+                    if (playerCount.length > 0)
+                    {
+                        await OBR.notification.show("Counter pinned to current player's view.");
+                        // Send the model state for the Pinned window
+                        await OBR.broadcast.sendMessage(Constants.BROADCASTAWAITID, `/pinned.html?modelid=${encodeURIComponent(this.selectedSave().Id)}&modelname=${encodeURIComponent(this.selectedSave().Name)}&modeltotal=${encodeURIComponent(this.selectedSave().Total)}&modelmarked=${encodeURIComponent(JSON.stringify(this.selectedSave().Marked))}&modeltype=checkbox`);
+                    }
+                    else
+                    {
+                        await OBR.notification.show("No players present.");
+                    }
+                }
             }
         }
 
