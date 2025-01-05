@@ -1,3 +1,4 @@
+import OBR from "@owlbear-rodeo/sdk";
 import { Constants } from "./utilities/bsConstants";
 
 class Clocks
@@ -7,6 +8,7 @@ class Clocks
     saveState: SaveState[];
 
     ADD = document.getElementById('clockAdd') as HTMLButtonElement;
+    PIN = document.getElementById('clockPin') as HTMLButtonElement;
     REMOVE = document.getElementById('clockRemove') as HTMLButtonElement;
     NEXT = document.getElementById('clockNext') as HTMLButtonElement;
     PREV = document.getElementById('clockPrevious') as HTMLButtonElement;
@@ -16,10 +18,17 @@ class Clocks
     DISPLAYCONTAINER = document.getElementById('clockDisplay') as HTMLDivElement;
     CAROUSELTRACK = document.getElementById('clockCarousel') as HTMLDivElement;
 
+    userRole: "PLAYER" | "GM" = "PLAYER";
+
     constructor()
     {
         this.saveState = [];
+    }
+
+    public async Initiate()
+    {
         this.localLoad();
+        this.userRole = await OBR.player.getRole();
     }
 
     public SetupControls()
@@ -31,7 +40,7 @@ class Clocks
             newClock.id = crypto.randomUUID();
             newClock.classList.add("clock-selected");
             newClock.classList.add("carousel-item");
-            newClock.appendChild(this.getClockSlices(this.defaultClock));
+            newClock.appendChild(this.GetClockSlices(this.defaultClock));
             this.CAROUSELTRACK.appendChild(newClock);
 
             // Save State
@@ -53,8 +62,21 @@ class Clocks
             this.updateCarousel();
             this.localSave();
         };
-        this.REMOVE.onclick = () =>
+
+        if (this.userRole === "GM")
         {
+            this.PIN.onclick = async () =>
+            {
+                if (this.selectedClock()?.id)
+                    // Send the model state for the Pinned window
+                    await OBR.broadcast.sendMessage(Constants.BROADCASTAWAITID, `/pinned.html?modelid=${encodeURIComponent(this.selectedSave().Id)}&modelname=${encodeURIComponent(this.selectedSave().Name)}&modeltotal=${encodeURIComponent(this.selectedSave().Total)}&modelmarked=${encodeURIComponent(JSON.stringify(this.selectedSave().Marked))}&modeltype=clock`);
+            }
+        }
+
+        this.REMOVE.onclick = async () =>
+        {
+            this.NAME.value = "";
+            await OBR.broadcast.sendMessage(Constants.BROADCASTREMOVEID, this.selectedSave()?.Id);
             const selected = this.CAROUSELTRACK.getElementsByClassName('clock-selected');
             if (selected.length > 0)
             {
@@ -114,7 +136,7 @@ class Clocks
             {
                 this.selectedSave().Total = newValue;
                 this.selectedClock().replaceChildren();
-                this.selectedClock().appendChild(this.getClockSlices(newValue));
+                this.selectedClock().appendChild(this.GetClockSlices(newValue));
             }
             this.localSave();
         };
@@ -125,14 +147,14 @@ class Clocks
         const carouselItems = this.CAROUSELTRACK.children;
         const newVisible = carouselItems[this.carouselIndex];
         if (!newVisible) return;
-        
+
         newVisible.classList.add("clock-selected");
         const itemWidth = carouselItems[0].clientWidth;
         this.CAROUSELTRACK.style.transform = `translateX(-${this.carouselIndex * itemWidth}px)`;
         this.NAME.value = this.selectedClock().getAttribute("clock-name") ?? "";
     };
 
-    private getClockSlices(numSlices: number)
+    public GetClockSlices(numSlices: number, disableToggle = false)
     {
         const fixedNumber = Math.min(numSlices, 100);
 
@@ -171,12 +193,12 @@ class Clocks
             path.setAttribute("cut", i.toString());
             path.setAttribute("toggled", "0");
             path.setAttribute("stroke", `hsl(${(360 / fixedNumber) * i}, 70%, 70%)`);
-            path.addEventListener("click", () => toggleSlice(path));
+            if (!disableToggle) path.addEventListener("click", () => toggleSlice(path));
 
             svg.appendChild(path);
         }
 
-        const toggleSlice = (path: SVGPathElement) => 
+        const toggleSlice = async (path: SVGPathElement) => 
         {
             path.classList.toggle("path-selected");
             path.setAttribute("toggled", path.classList.contains("path-selected") ? "1" : "0");
@@ -196,9 +218,18 @@ class Clocks
 
             this.selectedSave().Marked = newSliceData;
             this.localSave();
+            await this.UpdatePins();
             //console.log(`Slice Toggled: ${path.getAttribute("cut")} = ${path.classList.contains("path-selected")}`);
         }
         return svg;
+    }
+
+    private async UpdatePins()
+    {
+        if (this.userRole === "GM")
+        {
+            await OBR.broadcast.sendMessage(Constants.BROADCASTID, this.selectedSave());
+        }
     }
 
     private selectedClock = () => this.CAROUSELTRACK.children[this.carouselIndex] as HTMLElement;
@@ -219,7 +250,7 @@ class Clocks
                 const newClock = document.createElement('div');
                 newClock.id = state.Id;
                 newClock.classList.add("carousel-item");
-                newClock.appendChild(this.getClockSlices(state.Total));
+                newClock.appendChild(this.GetClockSlices(state.Total));
 
                 const htmlSlices = newClock.querySelectorAll<SVGPathElement>('.slice');
                 state.Marked.forEach(mark =>
@@ -251,7 +282,6 @@ class Clocks
             }
         }
     }
-
 }
 
 export const CLOCKS = new Clocks();
