@@ -208,12 +208,17 @@ input[type=number] {
     gap: 2px;
 }
 
-.control-button
-{
+#counterName,
+#checkboxName,
+#clockName {
+    width: 60px;
+}
+
+.control-button {
     background-color: transparent;
 }
-.button-svg
-{
+
+.button-svg {
     height: 100%;
 }
 
@@ -222,11 +227,11 @@ button:hover {
     background-color: var(--OBR-Purple-Select-transparent);
 }
 
-.max
-{
+.max {
     width: 100%;
     height: 84%;
 }
+
 .pos-relative {
     position: relative;
     width: 100%;
@@ -295,6 +300,8 @@ path.path-selected {
 /* Carousel */
 .carousel-container {
     width: 100%;
+    max-width: 284px;
+    /* Bandaid for more than 2 Number counts*/
     text-align: center;
     align-content: center;
     overflow: hidden;
@@ -364,4 +371,89 @@ path.path-selected {
     width: 20px;
     padding: 2px;
     vertical-align: middle;
+}
+
+#pinnedMain {
+    background-color: var(--OBR-dark-blue-transparent);
+    border-radius: 16px;
+    height: 100%;
+    width: 100%;
+    scrollbar-gutter: stable;
+    overflow-y: hidden;
+}
+
+/* Overlay container */
+.hover-overlay::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 0, 0, 0.5);
+    /* Red tint */
+    opacity: 0;
+    z-index: 2;
+    transition: opacity 0.3s ease;
+}
+
+/* Giant 'X' */
+.hover-overlay::before {
+    content: 'X';
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 100px;
+    /* Adjust size */
+    font-weight: bold;
+    color: white;
+    opacity: 0;
+    z-index: 3;
+    transition: opacity 0.3s ease;
+}
+
+/* Hover effect */
+.hover-overlay:hover::after,
+.hover-overlay:hover::before {
+    opacity: 1;
+}
+
+.pinned-window {
+    display: flex;
+    margin-left: 8px;
+}
+
+.clock-window {
+    margin-top: -26px;
+}
+
+.checkbox-window {
+    height: 100%;
+    align-items: center;
+}
+
+.counter-window {
+    align-items: center;
+    margin-top: -10px;
+    margin-left: 12px !important;
+}
+
+.name-plate {
+    position: absolute;
+    color: var(--OBR-font);
+    font-variant: small-caps;
+    font-weight: bolder;
+    width: 90%;
+    text-align: center;
+    text-shadow:
+        -2px -2px 0 var(--OBR-offset-background),
+        /* Top-left */
+        2px -2px 0 var(--OBR-offset-background),
+        /* Top-right */
+        -2px 2px 0 var(--OBR-offset-background),
+        /* Bottom-left */
+        2px 2px 0 var(--OBR-offset-background);
+    /* Bottom-right */
 }

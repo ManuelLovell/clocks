@@ -1,3 +1,4 @@
+import OBR from "@owlbear-rodeo/sdk";
 import { Constants } from "./utilities/bsConstants";
 
 class Checkbox
@@ -7,6 +8,7 @@ class Checkbox
     saveState: SaveState[];
 
     ADD = document.getElementById('checkboxAdd') as HTMLButtonElement;
+    PIN = document.getElementById('checkboxPin') as HTMLButtonElement;
     REMOVE = document.getElementById('checkboxRemove') as HTMLButtonElement;
     NEXT = document.getElementById('checkboxNext') as HTMLButtonElement;
     PREV = document.getElementById('checkboxPrevious') as HTMLButtonElement;
@@ -16,10 +18,17 @@ class Checkbox
     DISPLAYCONTAINER = document.getElementById('checkboxDisplay') as HTMLDivElement;
     CAROUSELTRACK = document.getElementById('checkboxCarousel') as HTMLDivElement;
 
+    userRole: "PLAYER" | "GM" = "PLAYER";
+
     constructor()
     {
         this.saveState = [];
+    }
+
+    public async Initiate()
+    {
         this.localLoad();
+        this.userRole = await OBR.player.getRole();
     }
 
     public SetupControls()
@@ -31,7 +40,7 @@ class Checkbox
             newCheckbox.id = crypto.randomUUID();
             newCheckbox.classList.add("checkbox-selected");
             newCheckbox.classList.add("carousel-item");
-            newCheckbox.appendChild(this.getSvgCheckboxes(this.defaultCheckbox));
+            newCheckbox.appendChild(this.GetSvgCheckboxes(this.defaultCheckbox));
             this.CAROUSELTRACK.appendChild(newCheckbox);
 
             // Save State
@@ -53,8 +62,32 @@ class Checkbox
             this.updateCarousel();
             this.localSave();
         };
-        this.REMOVE.onclick = () =>
+
+        if (this.userRole === "GM")
         {
+            this.PIN.onclick = async () =>
+            {
+                if (this.selectedCheckbox()?.id)
+                {
+                    const playerCount = await OBR.party.getPlayers();
+                    if (playerCount.length > 0)
+                    {
+                        await OBR.notification.show("Counter pinned to current player's view.");
+                        // Send the model state for the Pinned window
+                        await OBR.broadcast.sendMessage(Constants.BROADCASTAWAITID, `/pinned.html?modelid=${encodeURIComponent(this.selectedSave().Id)}&modelname=${encodeURIComponent(this.selectedSave().Name)}&modeltotal=${encodeURIComponent(this.selectedSave().Total)}&modelmarked=${encodeURIComponent(JSON.stringify(this.selectedSave().Marked))}&modeltype=checkbox`);
+                    }
+                    else
+                    {
+                        await OBR.notification.show("No players present.");
+                    }
+                }
+            }
+        }
+
+        this.REMOVE.onclick = async () =>
+        {
+            this.NAME.value = "";
+            await OBR.broadcast.sendMessage(Constants.BROADCASTREMOVEID, this.selectedSave()?.Id);
             const selected = this.CAROUSELTRACK.getElementsByClassName('checkbox-selected');
             if (selected.length > 0)
             {
@@ -112,7 +145,8 @@ class Checkbox
             {
                 this.selectedSave().Total = newValue;
                 this.selectedCheckbox().replaceChildren();
-                this.selectedCheckbox().appendChild(this.getSvgCheckboxes(newValue));
+                this.selectedCheckbox().appendChild(this.GetSvgCheckboxes(newValue));
+                this.selectedSave().Marked = [];
             }
             this.localSave();
         };
@@ -130,7 +164,7 @@ class Checkbox
         this.NAME.value = this.selectedCheckbox().getAttribute("checkbox-name") ?? "";
     };
 
-    private getSvgCheckboxes(numCheckboxes: number): SVGSVGElement
+    public GetSvgCheckboxes(numCheckboxes: number, disableToggle = false): SVGSVGElement
     {
         const fixedNumber = Math.min(numCheckboxes, 100);
 
@@ -183,12 +217,12 @@ class Checkbox
             checkboxGroup.appendChild(rect);
             checkboxGroup.appendChild(checkmark);
 
-            checkboxGroup.addEventListener("click", () => toggleCheckbox(checkmark));
+            if (!disableToggle) checkboxGroup.addEventListener("click", () => toggleCheckbox(checkmark));
 
             svg.appendChild(checkboxGroup);
         }
 
-        const toggleCheckbox = (checkmark: SVGPathElement) =>
+        const toggleCheckbox = async (checkmark: SVGPathElement) =>
         {
             checkmark.classList.toggle('check-selected');
             checkmark.setAttribute("toggled", checkmark.classList.contains("check-selected") ? "1" : "0");
@@ -214,9 +248,22 @@ class Checkbox
         return svg;
     }
 
+    private async UpdatePins()
+    {
+        const role = await OBR.player.getRole();
+        if (role === "GM")
+        {
+            await OBR.broadcast.sendMessage(Constants.BROADCASTID, this.selectedSave());
+        }
+    }
+
     private selectedCheckbox = () => this.CAROUSELTRACK.children[this.carouselIndex] as HTMLElement;
     private selectedSave = () => this.saveState.find(x => x.Id === this.selectedCheckbox().id) as SaveState;
-    private localSave = () => localStorage.setItem(Constants.EXTENSIONID + "_Checkboxes", JSON.stringify(this.saveState));
+    private localSave = async () =>
+    {
+        localStorage.setItem(Constants.EXTENSIONID + "_Checkboxes", JSON.stringify(this.saveState))
+        await this.UpdatePins();
+    };
     private localLoad()
     {
         const saveData = localStorage.getItem(Constants.EXTENSIONID + "_Checkboxes");
@@ -232,7 +279,7 @@ class Checkbox
                 const newCheckbox = document.createElement('div');
                 newCheckbox.id = state.Id;
                 newCheckbox.classList.add("carousel-item");
-                newCheckbox.appendChild(this.getSvgCheckboxes(state.Total));
+                newCheckbox.appendChild(this.GetSvgCheckboxes(state.Total));
 
                 const htmlSlices = newCheckbox.querySelectorAll<SVGPathElement>('.checkmark');
                 state.Marked.forEach(mark =>

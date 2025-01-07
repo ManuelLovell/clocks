@@ -1,3 +1,4 @@
+import OBR from "@owlbear-rodeo/sdk";
 import { Constants } from "./utilities/bsConstants";
 
 class Counters
@@ -6,6 +7,7 @@ class Counters
     saveState: SaveState[];
 
     ADD = document.getElementById('counterAdd') as HTMLButtonElement;
+    PIN = document.getElementById('counterPin') as HTMLButtonElement;
     REMOVE = document.getElementById('counterRemove') as HTMLButtonElement;
     NEXT = document.getElementById('counterNext') as HTMLButtonElement;
     PREV = document.getElementById('counterPrevious') as HTMLButtonElement;
@@ -15,10 +17,17 @@ class Counters
     DISPLAYCONTAINER = document.getElementById('counterDisplay') as HTMLDivElement;
     CAROUSELTRACK = document.getElementById('counterCarousel') as HTMLDivElement;
 
+    userRole: "PLAYER" | "GM" = "PLAYER";
+
     constructor()
     {
         this.saveState = [];
+    }
+
+    public async Initiate()
+    {
         this.localLoad();
+        this.userRole = await OBR.player.getRole();
     }
 
     public SetupControls()
@@ -30,7 +39,7 @@ class Counters
             newCounter.id = crypto.randomUUID();
             newCounter.classList.add("counter-selected");
             newCounter.classList.add("carousel-item");
-            newCounter.appendChild(this.getSvgNumberCounter());
+            newCounter.appendChild(this.GetSvgNumberCounter());
             this.CAROUSELTRACK.appendChild(newCounter);
 
             // Save State
@@ -52,8 +61,32 @@ class Counters
             this.updateCarousel();
             this.localSave();
         };
-        this.REMOVE.onclick = () =>
+
+        if (this.userRole === "GM")
         {
+            this.PIN.onclick = async () =>
+            {
+                if (this.selectedCounter()?.id)
+                {
+                    const playerCount = await OBR.party.getPlayers();
+                    if (playerCount.length > 0)
+                    {
+                        await OBR.notification.show("Counter pinned to current player's view.");
+                        // Send the model state for the Pinned window
+                        await OBR.broadcast.sendMessage(Constants.BROADCASTAWAITID, `/pinned.html?modelid=${encodeURIComponent(this.selectedSave().Id)}&modelname=${encodeURIComponent(this.selectedSave().Name)}&modeltotal=${encodeURIComponent(this.selectedSave().Total)}&modelmarked=${encodeURIComponent(JSON.stringify(this.selectedSave().Marked))}&modeltype=counter`);
+                    }
+                    else
+                    {
+                        await OBR.notification.show("No players present.");
+                    }
+                }
+            }
+        }
+
+        this.REMOVE.onclick = async () =>
+        {
+            this.NAME.value = "";
+            await OBR.broadcast.sendMessage(Constants.BROADCASTREMOVEID, this.selectedSave()?.Id);
             const selected = this.CAROUSELTRACK.getElementsByClassName('counter-selected');
             if (selected.length > 0)
             {
@@ -126,7 +159,7 @@ class Counters
         this.NAME.value = this.selectedCounter().getAttribute("counter-name") ?? "";
     };
 
-    private getSvgNumberCounter(): SVGSVGElement
+    public GetSvgNumberCounter(disableToggle = false): SVGSVGElement
     {
         const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         const width = 120;
@@ -214,39 +247,51 @@ class Counters
         decrementGroup.appendChild(decrementText);
 
         // Event handlers
-        incrementGroup.addEventListener("click", () =>
+        incrementGroup.addEventListener("click", async () =>
         {
             let current = parseInt(displayText.textContent ?? "0");
             current++;
             displayText.textContent = current.toString();
-            SaveState();
+            await SaveState();
         });
 
-        decrementGroup.addEventListener("click", () =>
+        decrementGroup.addEventListener("click", async () =>
         {
             let current = parseInt(displayText.textContent ?? "0");
             current--;
             displayText.textContent = current.toString();
-            SaveState();
+            await SaveState();
         });
 
-        function SaveState()
+        async function SaveState()
         {
             COUNTERS.selectedSave().Total = parseInt(displayText.textContent ?? "0");
             COUNTERS.localSave();
         }
 
-        svg.appendChild(incrementGroup);
+        if (!disableToggle) svg.appendChild(incrementGroup);
         svg.appendChild(displayGroup);
-        svg.appendChild(decrementGroup);
+        if (!disableToggle) svg.appendChild(decrementGroup);
 
         return svg;
     }
 
+    public async UpdatePins()
+    {
+        const role = await OBR.player.getRole();
+        if (role === "GM")
+        {
+            await OBR.broadcast.sendMessage(Constants.BROADCASTID, this.selectedSave());
+        }
+    }
 
     private selectedCounter = () => this.CAROUSELTRACK.children[this.carouselIndex] as HTMLElement;
     private selectedSave = () => this.saveState.find(x => x.Id === this.selectedCounter().id) as SaveState;
-    private localSave = () => localStorage.setItem(Constants.EXTENSIONID + "_Counters", JSON.stringify(this.saveState));
+    private localSave = async () => 
+    {
+        localStorage.setItem(Constants.EXTENSIONID + "_Counters", JSON.stringify(this.saveState));
+        await this.UpdatePins();
+    };
     private localLoad()
     {
         const saveData = localStorage.getItem(Constants.EXTENSIONID + "_Counters");
@@ -262,7 +307,7 @@ class Counters
                 const newCounter = document.createElement('div');
                 newCounter.id = state.Id;
                 newCounter.classList.add("carousel-item");
-                newCounter.appendChild(this.getSvgNumberCounter());
+                newCounter.appendChild(this.GetSvgNumberCounter());
 
                 const displayText = newCounter.querySelector<SVGTextElement>('.display-text');
                 if (displayText)
