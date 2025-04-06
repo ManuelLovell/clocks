@@ -87,6 +87,7 @@ class Clocks
         this.REMOVE.onclick = async () =>
         {
             this.NAME.value = "";
+            if (!this.selectedSave()) return; 
             await OBR.broadcast.sendMessage(Constants.BROADCASTREMOVEID, this.selectedSave()?.Id);
             const selected = this.CAROUSELTRACK.getElementsByClassName('clock-selected');
             if (selected.length > 0)
@@ -244,7 +245,11 @@ class Clocks
     }
 
     private selectedClock = () => this.CAROUSELTRACK.children[this.carouselIndex] as HTMLElement;
-    private selectedSave = () => this.saveState.find(x => x.Id === this.selectedClock().id) as SaveState;
+    private selectedSave = () => 
+    {
+        const selSave = this.saveState.find(x => x.Id === this.selectedClock()?.id) as SaveState;
+        return selSave ?? { Id: ""}
+    }
     private localSave = async () =>
     {
         localStorage.setItem(Constants.EXTENSIONID + "_Clocks", JSON.stringify(this.saveState));

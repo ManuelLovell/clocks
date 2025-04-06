@@ -248,6 +248,14 @@ button:hover {
 }
 
 /* Clocks */
+#clockControls {
+    z-index: 10;
+    pointer-events: none;
+}
+#clockControls .control-button {
+  pointer-events: auto;
+}
+
 .checkbox-svg {
     max-height: 140px;
     width: 100%;

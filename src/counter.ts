@@ -86,10 +86,12 @@ class Counters
         this.REMOVE.onclick = async () =>
         {
             this.NAME.value = "";
+            if (!this.selectedSave()) return; 
             await OBR.broadcast.sendMessage(Constants.BROADCASTREMOVEID, this.selectedSave()?.Id);
             const selected = this.CAROUSELTRACK.getElementsByClassName('counter-selected');
             if (selected.length > 0)
             {
+                this.saveState = this.saveState.filter(x => x.Id !== selected[0].id);
                 selected[0].remove();
             }
 
@@ -286,7 +288,11 @@ class Counters
     }
 
     private selectedCounter = () => this.CAROUSELTRACK.children[this.carouselIndex] as HTMLElement;
-    private selectedSave = () => this.saveState.find(x => x.Id === this.selectedCounter().id) as SaveState;
+    private selectedSave = () =>
+    {
+        const selSave = this.saveState.find(x => x.Id === this.selectedCounter()?.id) as SaveState;
+        return selSave ?? { Id: "" }
+    }
     private localSave = async () => 
     {
         localStorage.setItem(Constants.EXTENSIONID + "_Counters", JSON.stringify(this.saveState));
