@@ -96,38 +96,35 @@ class Clocks
                 selected[0].remove();
             }
 
-            if (this.CAROUSELTRACK.children.length > 0)
+            const carouselItems = this.CAROUSELTRACK.children;
+            if (carouselItems.length > 0)
             {
-                // Show the next runner up
-                // Apply new selected
-                const carouselItems = this.CAROUSELTRACK.children;
-                this.carouselIndex--;
-                if (this.carouselIndex >= 0)
-                {
-                    const newVisible = carouselItems[this.carouselIndex];
-                    newVisible.classList.add("clock-selected");
-                    this.updateCarousel();
-                }
-                else if (carouselItems.length > 0)
+                // Adjust index if we're now beyond the end
+                if (this.carouselIndex >= carouselItems.length)
                 {
                     this.carouselIndex = carouselItems.length - 1;
-                    const newVisible = carouselItems[this.carouselIndex];
-                    newVisible.classList.add("clock-selected");
-                    this.updateCarousel();
-                } else this.carouselIndex = 0;
+                }
+                
+                const newVisible = carouselItems[this.carouselIndex];
+                newVisible.classList.add("clock-selected");
+                this.updateCarousel();
+            }
+            else
+            {
+                this.carouselIndex = 0;
             }
             this.localSave();
         };
         this.PREV.onclick = () =>
         {
             const carouselItems = this.CAROUSELTRACK.children;
-            this.carouselIndex = (this.carouselIndex - 1 + carouselItems.length) % carouselItems.length;
+            this.carouselIndex = (this.carouselIndex + 1) % carouselItems.length;
             this.updateCarousel();
         }
         this.NEXT.onclick = () =>
         {
             const carouselItems = this.CAROUSELTRACK.children;
-            this.carouselIndex = (this.carouselIndex + 1) % carouselItems.length;
+            this.carouselIndex = (this.carouselIndex - 1 + carouselItems.length) % carouselItems.length;
             this.updateCarousel();
         }
         this.NAME.onblur = () =>
@@ -161,6 +158,10 @@ class Clocks
         const newVisible = carouselItems[this.carouselIndex];
         if (!newVisible) return;
 
+        // Remove clock-selected from all items
+        Array.from(carouselItems).forEach(item => item.classList.remove("clock-selected"));
+        
+        // Add to current item
         newVisible.classList.add("clock-selected");
         const itemWidth = carouselItems[0].clientWidth;
         this.CAROUSELTRACK.style.transform = `translateX(-${this.carouselIndex * itemWidth}px)`;
